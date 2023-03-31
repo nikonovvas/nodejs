@@ -1,0 +1,83 @@
+    *{
+        cursor: default;
+    }
+    a:hover  {
+        /* color: inherit; */
+        cursor: default;
+    }
+    .toggler { width: 500px; height: 200px; }
+    #button { padding: .5em 1em; text-decoration: none; }
+    #effect { width: 240px; height: 170px; padding: 0.4em; position: relative; }
+    #effect h3 { margin: 0; padding: 0.4em; text-align: center; }
+
+    .wrapper{
+        background-color: black;
+        min-height: 100vh;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: bottom center;
+        font-family: 'Roboto', sans-serif;
+
+    }
+
+    .container{
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .start_page{
+        margin-left: auto;
+        margin-right: auto;
+
+        color: rgb(0, 0, 0);
+    }
+    .info{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .blok_sensors{
+        color: rgb(0, 0, 0);
+    }
+
+    .baner{
+        /* background-image: url(https://bogatyr.club/uploads/posts/2021-11/thumbs/1636951510_2-bogatyr-club-p-zadnii-fon-chernii-2.jpg); */
+        background-color: rgb(255, 255, 255);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: 50%;
+        border-radius: 20px;
+    }
+    .baner_in{
+        padding-right: 100px;
+        padding-left: 100px;
+        padding-top:3%;
+        padding-bottom: 3%;
+        /* width: 100%; */
+    }
+    .nes-badge{
+        width: 50%;
+    }
+
+    @media only screen and (max-width: 768px) {
+        
+        *{
+            font-size: 14px;
+        }
+        body {
+        font-size: 8px;
+        }
+        h2{
+            font-size: 8px;
+        }
+        .sensor{
+            font-size: 10px;
+        }
+        .baner_in{
+            padding-right: 3%;
+            padding-left: 3%;
+
+        }
+    }
+
+    
+

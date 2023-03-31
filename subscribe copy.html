@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Подписка на топик</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.37.1/apexcharts.min.js"></script>
+    
+    <!-- <script type="text/javascript" src="public/js/client.js"></script> -->
+</head>
+
+<body>
+    <button onclick="reset_chartData()">Очиситить график</button>
+    <div id="chart"></div>
+
+    <script>
+        // Инициализация клиента
+        const socket = io();
+        // получаем сохраненные топики из localStorage
+        const saveTopics = JSON.parse(localStorage.getItem('saveTopics')) || [];
+        const subscribedTopics = JSON.parse(localStorage.getItem('subscribedTopics')) || [];
+
+        // подписываемся на топики, которых еще нет в savedTopics
+        subscribedTopics.forEach(topic => {
+            if (!saveTopics.includes(topic)) {
+                saveTopics.push(topic);
+                socket.emit('subscribe', topic);
+            }
+        });
+
+        localStorage.setItem('saveTopics', JSON.stringify(saveTopics));
+
+
+        let chartData = JSON.parse(localStorage.getItem('chartData')) || [];
+
+        let options = {
+            title: {
+                text: "Данные",
+                align: "center",
+                style: {
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    color: "#263238"
+                }
+            },
+            series: [
+                {
+                    name: "Знаение",
+                    data: chartData
+                }
+            ],
+            chart: {
+                height: 350,
+                type: "line"
+            },
+            xaxis: {
+                type: "datetime",
+                labels: {
+                    datetimeUTC: false,
+                    format: "HH:mm"
+                }
+            },
+            datetimeFormatter: {
+                year: 'yyyy',
+                month: 'MMM \'yy',
+                day: 'dd MMM',
+                hour: 'HH:mm'
+            },
+            tooltip: {
+                x: {
+                    formatter: function (value) {
+                        return new Date(value).toLocaleString();
+                    }
+                }
+            }
+        };
+
+        let chart = new ApexCharts(document.querySelector("#chart"), options);
+        
+        socket.on('data', (mes,topic) => {
+
+            let now = new Date()
+            let value = mes; // здесь нужно указать, откуда приходит значение
+
+            chartData.push({
+                x: now,
+                y: value
+            });
+            console.log(chartData)
+            chart.updateSeries([
+                {
+                    data: chartData
+                }
+            ]);
+            localStorage.setItem('chartData', JSON.stringify(chartData));
+        });
+
+        // Рендерим график
+        chart.render();
+    </script>
+</body>
+
+</html>

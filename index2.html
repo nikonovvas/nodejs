@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Подписка на топик</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.37.1/apexcharts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital@1&amp;family=Press+Start+2P&amp;display=swap"
+        rel="stylesheet">
+
+    <link href="https://unpkg.com/nes.css/css/nes-core.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/reset.css">
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- <script type="text/javascript" src="public/js/client.js"></script> -->
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <section class="baner">
+                <div class="baner_in">
+
+                    <form id="subscription-form" action="/subscribe">
+                        <input onclick="connect()" type="submit" value="Подписаться"><br>
+                        <div class="block nes-container with-title">
+                            <label class="title" for="server">Сервер:</label>
+                            <div class="nes-select">
+                                <select name="server" id="server">
+                                    <option value="" disabled selected hidden>Select...</option>
+                                    <option value="broker.hivemq.com">broker.hivemq.com</option>
+                                    <option value="local">local</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="block nes-container with-title">
+                            <label class="title" for="port">Порт:</label>
+                            <input class='sensor nes-input is-error' type="text" name="port" id="port"
+                                value="1883"><br><br>
+                        </div>
+                        <br>
+                        <div id="div">
+                            <label for="sensor0">Имя датчика:</label>
+                            <input type="text" id="sensor0" name="sensor0"><br>
+                            <label for="topic0">Ссылка на topic:</label>
+                            <input type="text" id="topic0" name="topic0"><br>
+                        </div>
+                        
+                    </form>
+                    <button onclick="addSensor()">Добавить датчик</button><br>
+                    <button onclick="dat()">info dat</button><br>
+                    
+                </div>
+            </section>
+        </div>
+    </div>
+    <script>
+
+        function addSensor() {
+            var form = document.getElementById("subscription-form");
+            var inputCount = form.getElementsByTagName("input").length;
+
+            // Создаем новый блок с полями для ввода
+            var newDiv = document.createElement("div");
+            newDiv.innerHTML = `
+				<label for="sensor${inputCount}">Имя датчика:</label><br>
+				<input type="text" id="sensor${inputCount}" name="sensor${inputCount}"><br>
+				<label for="topic${inputCount}">Ссылка на topic:</label><br>
+				<input type="text" id="topic${inputCount}" name="topic${inputCount}"><br>
+			`;
+            form.appendChild(newDiv);
+        }
+
+
+
+        function dat() {
+            // Создаем словарь с именами датчиков и ссылками на них
+            var sensors = {};
+            var form = document.getElementById("subscription-form");
+            var inputs = form.getElementsByTagName("input");
+            for (var i = 0; i < inputs.length; i++) {
+                var input = inputs[i];
+                if (input.type === "text") {
+                    var name = input.name;
+                    var value = input.value;
+                    // Разбиваем имя поля на "sensor" и номер
+                    var splitName = name.split("sensor");
+                    // Если имя поля содержит "sensor", то добавляем соответствующее значение в словарь
+                    if (splitName.length === 2 && splitName[1] !== "") {
+                        sensors[name] = value;
+                    }
+                }
+            }
+            console.log(sensors);
+        }
+
+
+        function connect() {
+            const socket = io();
+            var subscribedTopics = [];
+            // при отправке формы добавляем новый топик в subscribedTopics и сохраняем его в localStorage
+            const form = document.getElementById('subscription-form');
+            form.addEventListener('submit', event => {
+                localStorage.removeItem('saveTopics');
+                // // отправляем данные формы на сервер
+                // const topicInput = document.getElementById('topic');
+                // const topic = topicInput.value;
+                // subscribedTopics.push(topic);
+
+
+                var topicInputs = document.querySelectorAll('input[id="topic"]');
+
+                for (var i = 0; i < topicInputs.length; i++) {
+                    subscribedTopics.push(topicInputs[i].value);
+                }
+
+                alert(subscribedTopics);
+
+                localStorage.setItem('subscribedTopics', JSON.stringify(subscribedTopics));
+
+                fetch('/subscribe', {
+                    method: 'POST',
+                    body: new FormData(form)
+                })
+            });
+        }
+
+    </script>
+</body>
+
+</html>
